@@ -33,8 +33,8 @@ export default function Page() {
   }, [data, state, setState]);
 
   useEffect(() => {
-    console.log(error);
     if (error && state === "processing") {
+      // Stay on landing to show error
       setState("landing");
     }
   }, [error, state, setState]);
@@ -43,13 +43,7 @@ export default function Page() {
     if (!url.trim()) return;
 
     setState("processing");
-
-    try {
-      await analyze(url);
-    } catch (err) {
-      console.error(err);
-      setState("landing");
-    }
+    await analyze(url);
   };
 
   return (
@@ -64,6 +58,8 @@ export default function Page() {
               url={url}
               onUrlChange={setUrl}
               onGenerate={handleGenerate}
+              error={error}
+              isLoading={isLoading}
             />
           )}
 

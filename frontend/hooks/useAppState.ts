@@ -18,7 +18,7 @@ interface UseAppStateReturn {
  */
 export function useAppState(): UseAppStateReturn {
   const [state, setState] = useState<AppState>('landing');
-  const [url, setUrl] = useState('');
+  const [url, setUrl] = useState('https://www.i18next.com');
   return {
     state,
     setState,
