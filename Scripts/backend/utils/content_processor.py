@@ -31,11 +31,25 @@ class ContentProcessor:
         soup = self.cleanup_html(soup)
         return md(str(soup), heading_style="ATX")
     
-    def sanitize_filename(self, name: str) -> str:
-        """Convert a string into a safe filename"""
+    def sanitize_filename(self, name: str, max_length: int = 100) -> str:
+        """
+        Convert a string into a safe filename with length limit
+        
+        Args:
+            name: Original name to sanitize
+            max_length: Maximum length for the filename (default: 100)
+            
+        Returns:
+            Sanitized filename with length limit
+        """
         # Remove special characters and replace spaces with underscores
         safe_name = re.sub(r'[^\w\s-]', '', name).strip()
         safe_name = safe_name.replace(" ", "_")
+        
+        # Truncate if too long, keeping the most important part (beginning)
+        if len(safe_name) > max_length:
+            safe_name = safe_name[:max_length].rstrip('_')
+        
         return safe_name
     
     def extract_description(self, html_content: str, page_title: str = "",
