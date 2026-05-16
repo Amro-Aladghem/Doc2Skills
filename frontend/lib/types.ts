@@ -53,4 +53,34 @@ export interface NavTreeNode {
   isLast?: boolean;
 }
 
+/**
+ * API Response Types
+ */
+
+/**
+ * Skill file from backend analysis
+ */
+export interface SkillFile {
+  fileName: string;
+  content: string;
+}
+
+/**
+ * Backend API analyze response
+ */
+export interface AnalyzeResponse {
+  files: SkillFile[];
+  library: string;
+  source: string;
+  total: number;
+}
+
+/**
+ * API Error response
+ */
+export interface ApiError {
+  error: string;
+  message?: string;
+}
+
 // Made with Bob

@@ -99,6 +99,9 @@ The application follows a **state machine pattern** with three distinct states:
 ```
 frontend/
 ├── app/                          # Next.js App Router
+│   ├── api/                     # API routes (Next.js Route Handlers)
+│   │   └── analyze/             # Documentation analysis endpoint
+│   │       └── route.ts         # POST /api/analyze handler
 │   ├── layout.tsx               # Root layout with metadata
 │   ├── page.tsx                 # Main application page
 │   ├── globals.css              # Global styles & Tailwind imports
@@ -139,12 +142,14 @@ frontend/
 │
 ├── hooks/                       # Custom React hooks
 │   ├── useAppState.ts          # Application state machine
-│   └── useProcessing.ts        # Processing simulation logic
+│   ├── useProcessing.ts        # Processing simulation logic
+│   └── useAnalyze.ts           # Backend API integration hook
 │
 ├── lib/                         # Utilities & configurations
 │   ├── types.ts                # TypeScript type definitions
 │   ├── constants.ts            # Application constants
-│   └── animations.ts           # Animation configurations
+│   ├── animations.ts           # Animation configurations
+│   └── api.ts                  # API client with error handling
 │
 ├── utils/                       # Helper functions
 │   └── mockData.ts             # Mock data for demo
@@ -218,6 +223,135 @@ const { statusLines, progress, isComplete } = useProcessing(isActive);
 - `statusLines`: Array of processing status lines with completion state
 - `progress`: Current progress percentage (0-100)
 - `isComplete`: Boolean indicating if processing is complete
+
+#### `useAnalyze`
+Handles backend API integration for documentation analysis.
+
+```typescript
+const { data, isLoading, error, analyze, reset } = useAnalyze();
+```
+
+**Returns:**
+- `data`: Analysis response with generated skill files (null if not yet analyzed)
+- `isLoading`: Boolean indicating if request is in progress
+- `error`: Error message string (null if no error)
+- `analyze`: Function to trigger analysis with a URL
+- `reset`: Function to clear state
+
+**Usage Example:**
+```typescript
+import { useAnalyze } from '@/hooks/useAnalyze';
+
+function MyComponent() {
+  const { data, isLoading, error, analyze } = useAnalyze();
+
+  const handleSubmit = async (url: string) => {
+    await analyze(url);
+  };
+
+  if (isLoading) return <div>Analyzing...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (data) return <div>Found {data.total} skill files</div>;
+
+  return <button onClick={() => handleSubmit('https://...')}>Analyze</button>;
+}
+```
+
+## 🔌 API Integration
+
+### Backend Connection
+
+The frontend connects to the Doc2Skills backend API through Next.js API routes, providing a secure proxy layer.
+
+#### Environment Configuration
+
+Create a `.env.local` file in the frontend directory:
+
+```env
+NEXT_PUBLIC_API_URL=https://your-backend-api.com
+```
+
+For local development:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000
+```
+
+#### API Routes
+
+**POST /api/analyze**
+
+Proxies documentation analysis requests to the backend.
+
+**Request:**
+```typescript
+{
+  url: string; // Documentation URL to analyze
+}
+```
+
+**Response:**
+```typescript
+{
+  files: Array<{
+    fileName: string;
+    content: string;
+  }>;
+  library: string;
+  source: string;
+  total: number;
+}
+```
+
+**Error Response:**
+```typescript
+{
+  error: string;
+  message?: string;
+}
+```
+
+#### API Client
+
+The `apiClient` utility provides type-safe methods for backend communication:
+
+```typescript
+import { apiClient } from '@/lib/api';
+
+// Analyze documentation
+try {
+  const result = await apiClient.analyze('https://github.com/user/repo');
+  console.log(`Generated ${result.total} skill files`);
+} catch (error) {
+  if (error instanceof ApiClientError) {
+    console.error(`API Error: ${error.message}`);
+  }
+}
+```
+
+**Features:**
+- Type-safe request/response handling
+- Automatic error parsing
+- Custom `ApiClientError` class
+- Centralized configuration
+
+#### Integration Flow
+
+```
+┌──────────┐      ┌─────────────┐      ┌─────────────┐
+│ Frontend │ ───> │ Next.js API │ ───> │   Backend   │
+│  (React) │      │   Route     │      │  (Python)   │
+└──────────┘      └─────────────┘      └─────────────┘
+     │                   │                     │
+     │                   │                     │
+     └─── useAnalyze ────┴──── /api/analyze ──┘
+```
+
+1. User submits URL via `useAnalyze` hook
+2. Hook calls `/api/analyze` Next.js route
+3. Route proxies request to backend API
+4. Backend processes documentation
+5. Response flows back through the chain
+6. UI updates with generated skills
 
 ## 🎨 Styling
 
@@ -384,7 +518,7 @@ This project is licensed under the Apache-2.0 License.
 
 ## 🙏 Acknowledgments
 
-Built with ❤️ by the Doc2Skills team
+Built with ❤️ by team FinalBeast
 
 ---
 
