@@ -4,13 +4,51 @@
  */
 
 import { GitBranch, FolderTree, FileCode2, BookOpenText, ChevronRight, ChevronDown } from 'lucide-react';
-import { mockRepositoryInfo, mockNavTree } from '@/utils/mockData';
+import { SkillFile } from '@/lib/types';
+
+interface RepositoryInfoProps {
+  source: string;
+  library: string;
+  totalFiles: number;
+  files: SkillFile[];
+}
 
 /**
  * Repository explorer panel - GitHub/VS Code inspired sidebar
  */
-export function RepositoryInfo() {
-  const { name, language, statusBadges } = mockRepositoryInfo;
+export function RepositoryInfo({ source, library, totalFiles, files }: RepositoryInfoProps) {
+  // Extract repository name from source URL
+  const getRepoName = (url: string) => {
+    try {
+      const urlObj = new URL(url);
+      const pathParts = urlObj.pathname.split('/').filter(Boolean);
+      if (pathParts.length >= 2) {
+        return `${pathParts[0]}/${pathParts[1]}`;
+      }
+      return urlObj.hostname;
+    } catch {
+      return 'Unknown Repository';
+    }
+  };
+
+  const repoName = getRepoName(source);
+  
+  // Determine language from library or files
+  const getLanguage = () => {
+    if (library.toLowerCase().includes('github')) {
+      // Try to infer from file extensions if available
+      const firstFile = files[0]?.fileName || '';
+      if (firstFile.includes('.py')) return 'Python';
+      if (firstFile.includes('.ts') || firstFile.includes('.js')) return 'TypeScript';
+      if (firstFile.includes('.java')) return 'Java';
+      if (firstFile.includes('.go')) return 'Go';
+      return 'Mixed';
+    }
+    return library;
+  };
+
+  const language = getLanguage();
+  const statusBadges = ['Docs Parsed', 'APIs Mapped', `${totalFiles} Files Generated`];
 
   return (
     <div className="h-full flex flex-col bg-zinc-900/50 border border-zinc-800 rounded-lg overflow-hidden">
@@ -21,7 +59,7 @@ export function RepositoryInfo() {
           <span className="text-xs font-mono text-zinc-400">github.com/</span>
         </div>
         <div>
-          <h3 className="font-mono text-sm text-white font-medium">{name}</h3>
+          <h3 className="font-mono text-sm text-white font-medium">{repoName}</h3>
           <div className="flex items-center gap-2 mt-1.5">
             <span className="px-2 py-0.5 bg-brand/10 border border-brand/20 rounded text-[10px] font-mono text-brand">
               {language}
@@ -57,33 +95,26 @@ export function RepositoryInfo() {
           </div>
           
           <div className="space-y-0.5">
-            {mockNavTree.map((node, idx) => {
-              const isFolder = node.level === 0 || (node.level === 1 && node.label.includes('CRUD'));
-              const Icon = isFolder ? (node.level === 0 ? ChevronDown : ChevronRight) : FileCode2;
-              const iconSize = isFolder ? 12 : 14;
-              
-              return (
-                <div
-                  key={idx}
-                  className={`flex items-center gap-2 py-1 px-2 rounded hover:bg-zinc-800/50 cursor-pointer transition-colors group ${
-                    node.level === 0 ? '' : node.level === 1 ? 'pl-6' : 'pl-10'
-                  }`}
-                >
-                  {isFolder ? (
-                    <Icon size={iconSize} className="text-zinc-500 flex-shrink-0" />
-                  ) : (
-                    <BookOpenText size={iconSize} className="text-zinc-600 group-hover:text-brand flex-shrink-0 transition-colors" />
-                  )}
-                  <span className={`font-mono text-xs ${
-                    node.level === 0
-                      ? 'text-white font-medium'
-                      : 'text-zinc-400 group-hover:text-zinc-300'
-                  } transition-colors`}>
-                    {node.label.replace(/[├│└─]/g, '').trim()}
-                  </span>
-                </div>
-              );
-            })}
+            {/* Root folder */}
+            <div className="flex items-center gap-2 py-1 px-2 rounded">
+              <ChevronDown size={12} className="text-zinc-500 flex-shrink-0" />
+              <span className="font-mono text-xs text-white font-medium">
+                Skills
+              </span>
+            </div>
+            
+            {/* Generated skill files */}
+            {files.map((file, idx) => (
+              <div
+                key={idx}
+                className="flex items-center gap-2 py-1 px-2 pl-6 rounded hover:bg-zinc-800/50 cursor-pointer transition-colors group"
+              >
+                <BookOpenText size={14} className="text-zinc-600 group-hover:text-brand flex-shrink-0 transition-colors" />
+                <span className="font-mono text-xs text-zinc-400 group-hover:text-zinc-300 transition-colors truncate">
+                  {file.fileName}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
