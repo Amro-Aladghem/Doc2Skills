@@ -43,11 +43,11 @@
 /**
  * Mock generated skill files
  */
-export const mockSkillFiles: SkillFile[] = [
-  { fileName: 'Installation.md', content: '' },
-  { fileName: 'Authentication.md', content: '' },
-  { fileName: 'CRUD_Operations.md', content: '' },
-  { fileName: 'Example_Workflows.md', content: '' }
-]
+// export const mockSkillFiles: SkillFile[] = [
+//   { fileName: 'Installation.md', content: '' },
+//   { fileName: 'Authentication.md', content: '' },
+//   { fileName: 'CRUD_Operations.md', content: '' },
+//   { fileName: 'Example_Workflows.md', content: '' }
+// ]
 
 // // Made with Bob
