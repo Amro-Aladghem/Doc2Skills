@@ -33,7 +33,6 @@ export function useAnalyze(): UseAnalyzeReturn {
     setError(null);
 
     try {
-      console.log('Analyzing URL:', url);
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: {
