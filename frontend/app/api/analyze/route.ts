@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { AnalyzeResponse } from "@/lib/types/analyze";
+import { AnalyzeResponse } from "@/lib/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
   try {
     const { url } = await req.json();
 
+    console.log("Received request to analyze:", url);
     if (!url) {
       return NextResponse.json(
         { error: "URL is required" },
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Forward request to backend API
-    const response = await fetch(`${API_URL}/analyze`, {
+    const response = await fetch(`${API_URL}/api/analyze`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

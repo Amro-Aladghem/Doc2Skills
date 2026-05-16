@@ -3,16 +3,32 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { PageTransition } from '@/components/animations/PageTransition';
-import { RepositoryInfo } from './RepositoryInfo';
-import { PipelineVisualization } from './PipelineVisualization';
-import { GeneratedSkills } from './GeneratedSkills';
-import { ComparisonDemo } from './ComparisonDemo';
+import { PageTransition } from "@/components/animations/PageTransition";
+import { RepositoryInfo } from "./RepositoryInfo";
+import { PipelineVisualization } from "./PipelineVisualization";
+import { GeneratedSkills } from "./GeneratedSkills";
+import { ComparisonDemo } from "./ComparisonDemo";
+import { AnalyzeResponse } from "@/lib/types";
 
-/**
- * Workspace view component - IDE-like developer console layout
- */
-export function WorkspaceView() {
+interface WorkspaceViewProps {
+  data: AnalyzeResponse | null;
+  error: string | null;
+}
+
+export function WorkspaceView({ data, error }: WorkspaceViewProps) {
+  if (error) {
+    return (
+      <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-6">
+        <h3 className="text-red-400">Failed to generate skills</h3>
+
+        <p className="text-zinc-400">{error}</p>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return null;
+  }
   return (
     <PageTransition className="space-y-8">
       {/* Main IDE-like Layout */}

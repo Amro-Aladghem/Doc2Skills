@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { AnalyzeResponse } from '@/lib/types/analyze';
+import { AnalyzeResponse } from '@/lib/types'
 
 interface UseAnalyzeReturn {
   data: AnalyzeResponse | null;
@@ -33,6 +33,7 @@ export function useAnalyze(): UseAnalyzeReturn {
     setError(null);
 
     try {
+      console.log('Analyzing URL:', url);
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: {

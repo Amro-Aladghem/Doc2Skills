@@ -11,7 +11,6 @@ interface UseAppStateReturn {
   setState: (state: AppState) => void;
   url: string;
   setUrl: (url: string) => void;
-  handleGenerate: () => void;
 }
 
 /**
@@ -20,18 +19,11 @@ interface UseAppStateReturn {
 export function useAppState(): UseAppStateReturn {
   const [state, setState] = useState<AppState>('landing');
   const [url, setUrl] = useState('');
-
-  const handleGenerate = () => {
-    if (!url) return;
-    setState('processing');
-  };
-
   return {
     state,
     setState,
     url,
     setUrl,
-    handleGenerate,
   };
 }
 
