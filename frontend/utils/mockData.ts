@@ -33,12 +33,10 @@ export const mockNavTree: NavTreeNode[] = [
  * Mock generated skill files
  */
 export const mockSkillFiles: SkillFile[] = [
-  { name: 'Installation.md', size: '1.2kb' },
-  { name: 'Authentication.md', size: '0.8kb' },
-  { name: 'CRUD_Operations.md', size: '4.5kb' },
-  { name: 'Example_Workflows.md', size: '2.1kb' },
-  { name: 'Error_Codes.md', size: '3.2kb' },
-  { name: 'Security_Best_Practices.md', size: '1.9kb' },
-];
+  { fileName: 'Installation.md', content: '' },
+  { fileName: 'Authentication.md', content: '' },
+  { fileName: 'CRUD_Operations.md', content: '' },
+  { fileName: 'Example_Workflows.md', content: '' }
+]
 
 // Made with Bob
