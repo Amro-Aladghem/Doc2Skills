@@ -2,13 +2,13 @@
 Browser utilities for web scraping
 Shared functions for both full documentation and single page conversion
 """
+import os
 import time
 from typing import Optional
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
 from ..config import ConverterConfig
 
 
@@ -30,8 +30,26 @@ class BrowserManager:
         chrome_options.add_argument("--disable-blink-features=AutomationControlled")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--disable-gpu")
         
-        service = Service(ChromeDriverManager().install())
+        # Use installed ChromeDriver in Docker, fallback to webdriver_manager for local development
+        chromedriver_path = "/usr/local/bin/chromedriver"
+        if os.path.exists(chromedriver_path):
+            # Running in Docker - use installed ChromeDriver
+            service = Service(chromedriver_path)
+            print(f"[*] Using ChromeDriver from: {chromedriver_path}")
+        else:
+            # Local development - use webdriver_manager
+            try:
+                from webdriver_manager.chrome import ChromeDriverManager
+                service = Service(ChromeDriverManager().install())
+                print("[*] Using ChromeDriver from webdriver_manager")
+            except ImportError:
+                raise RuntimeError(
+                    "ChromeDriver not found. Either run in Docker or install webdriver-manager: "
+                    "pip install webdriver-manager"
+                )
+        
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
         self.driver.set_page_load_timeout(self.config.page_load_timeout)
         

@@ -25,6 +25,41 @@ class DocumentationConverter:
         self.content_processor = ContentProcessor(self.config)
         self.file_manager = FileManager(self.config)
     
+    def _clean_github_title(self, title: str, url: str) -> str:
+        """
+        Clean GitHub page titles to extract just the repo name
+        
+        GitHub titles follow the pattern: "GitHub - owner/repo: description"
+        This extracts just "owner/repo" for cleaner filenames
+        
+        Args:
+            title: Original page title
+            url: Page URL to check if it's from GitHub
+            
+        Returns:
+            Cleaned title (repo name for GitHub, original for others)
+        """
+        from urllib.parse import urlparse
+        
+        # Check if this is a GitHub URL
+        parsed = urlparse(url)
+        if 'github.com' not in parsed.netloc.lower():
+            return title
+        
+        # GitHub title pattern: "GitHub - owner/repo: description · GitHub"
+        # Extract just "owner/repo"
+        if ':' in title:
+            # Split at the first colon
+            before_colon = title.split(':', 1)[0].strip()
+            
+            # Remove "GitHub - " prefix if present
+            if before_colon.startswith('GitHub - '):
+                repo_name = before_colon.replace('GitHub - ', '', 1).strip()
+                return repo_name
+        
+        # If pattern doesn't match, return original title
+        return title
+    
     def convert_full_documentation(self, doc_url: str, output_dir: Optional[str] = None) -> Dict[str, any]:
         """
         Convert entire documentation site to markdown files
@@ -275,6 +310,8 @@ class DocumentationConverter:
                 title_tag = soup.find('title') or soup.find('h1')
                 if title_tag:
                     result['title'] = title_tag.get_text(strip=True)
+                    # Clean GitHub titles to extract just the repo name
+                    result['title'] = self._clean_github_title(result['title'], url)
             
             # Extract library name from URL
             library_name = self.file_manager.extract_library_name(url)
