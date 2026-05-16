@@ -29,6 +29,15 @@
 //   { label: '└── Examples', level: 1, isLast: true },
 // ];
 
+/**
+ * Mock generated skill files
+ */
+export const mockSkillFiles: SkillFile[] = [
+  { fileName: 'Installation.md', content: '' },
+  { fileName: 'Authentication.md', content: '' },
+  { fileName: 'CRUD_Operations.md', content: '' },
+  { fileName: 'Example_Workflows.md', content: '' }
+]
 // /**
 //  * Mock generated skill files
 //  */
