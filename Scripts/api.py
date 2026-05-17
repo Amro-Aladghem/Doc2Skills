@@ -113,9 +113,9 @@ def should_use_full_conversion(url: str) -> bool:
     parsed = urlparse(url)
     path = parsed.path.rstrip('/')
     
-    # Domain only (no path or just /)
+    # Domain only (no path or just /) - treat as documentation root
     if not path or path == '/':
-        return False
+        return True
     
     # Documentation keywords that indicate full conversion
     doc_keywords = ['docs', 'doc', 'learn', 'api', 'guide', 'documentation', 'reference', 'tutorial']
@@ -215,7 +215,8 @@ async def analyze_documentation(request: AnalyzeRequest):
             print(f"[API] Documentation root detected, using full conversion: {url}")
             result = converter.convert_full_documentation(
                 doc_url=url,
-                output_dir=None  # Will use domain extraction
+                output_dir=None,  # Will use domain extraction
+                max_pages=10  # Limit to 10 pages for API usage
             )
             
             if not result['success']:
