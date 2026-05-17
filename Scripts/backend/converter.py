@@ -60,13 +60,14 @@ class DocumentationConverter:
         # If pattern doesn't match, return original title
         return title
     
-    def convert_full_documentation(self, doc_url: str, output_dir: Optional[str] = None) -> Dict[str, any]:
+    def convert_full_documentation(self, doc_url: str, output_dir: Optional[str] = None, max_pages: Optional[int] = None) -> Dict[str, any]:
         """
         Convert entire documentation site to markdown files
         
         Args:
             doc_url: Base URL of the documentation
             output_dir: Optional custom output directory name
+            max_pages: Optional maximum number of pages to process (useful for API limits)
             
         Returns:
             Dictionary with conversion results and statistics
@@ -102,11 +103,17 @@ class DocumentationConverter:
                 soup = self.content_processor.parse_html(html_content)
                 links = self.content_processor.extract_links_from_navigation(soup, doc_url)
                 
+                # Apply max_pages limit if specified
+                if max_pages is not None and len(links) > max_pages:
+                    print(f"[*] Found {len(links)} documentation pages, limiting to {max_pages} pages")
+                    links = links[:max_pages]
+                else:
+                    print(f"[*] Found {len(links)} documentation pages")
+                
                 results['total_pages'] = len(links)
-                print(f"[*] Found {len(links)} documentation pages")
                 
                 # Process pages in parallel batches for maximum speed
-                batch_size = 10
+                batch_size = 1
                 print(f"[*] Processing in parallel batches of {batch_size} pages")
                 
                 for batch_start in range(0, len(links), batch_size):

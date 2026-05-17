@@ -36,4 +36,4 @@ ENV CHROME_BIN=/usr/bin/google-chrome-stable
 # Azure App Service uses port 80
 EXPOSE 80
 
-CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "api:app", "--bind", "0.0.0.0:80", "--timeout", "120"]
+CMD ["gunicorn", "-w", "1", "-k", "uvicorn.workers.UvicornWorker", "api:app", "--bind", "0.0.0.0:80", "--timeout", "600"]
