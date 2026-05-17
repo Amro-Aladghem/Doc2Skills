@@ -40,6 +40,20 @@ export function GeneratedSkills({ files }: GeneratedSkillsProps) {
   const totalSizeFormatted =
     totalSize < 1024 ? `${totalSize}B` : `${(totalSize / 1024).toFixed(1)}kb`;
 
+  const setFile = (file: SkillFile) => {
+    console.log("here");
+    if (file.fileName === selectedFile?.fileName) {
+      setSelectedFile(null);
+    } else {
+      setSelectedFile(file);
+    }
+  };
+
+  const truncateContent = (content: string): string => {
+    const quarter = Math.floor(content.length / 4);
+    return content.slice(0, quarter);
+  };
+
   return (
     <div className="h-full flex flex-col bg-zinc-900/50 border border-zinc-800 rounded-lg overflow-hidden">
       {/* Header */}
@@ -65,14 +79,14 @@ export function GeneratedSkills({ files }: GeneratedSkillsProps) {
         ) : (
           <>
             {/* Left Column: File List */}
-            <div className="w-1/2 border-r border-zinc-800 overflow-y-auto flex-shrink-0">
+            <div className="w-1/2 min-w-0 border-r border-zinc-800 overflow-y-auto overflow-x-hidden overscroll-contain flex-shrink-0">
               <div className="p-2 space-y-0.5">
                 {files.map((file, idx) => {
                   const isSelected = selectedFile?.fileName === file.fileName;
                   return (
                     <div
                       key={idx}
-                      onClick={() => setSelectedFile(file)}
+                      onClick={() => setFile(file)}
                       className={`flex items-center justify-between px-3 py-2 rounded cursor-pointer transition-all group ${
                         isSelected
                           ? "bg-brand/10 border border-brand/30"
@@ -108,7 +122,7 @@ export function GeneratedSkills({ files }: GeneratedSkillsProps) {
             </div>
 
             {/* Right Column: Markdown Preview */}
-            <div className="w-1/2 bg-zinc-950/50 overflow-y-auto flex-shrink-0">
+            <div className="w-1/2 min-w-0 bg-zinc-950/50 overflow-y-auto overflow-x-hidden overscroll-contain flex-shrink-0">
               {selectedFile ? (
                 <div className="p-4">
                   {/* File Header */}
@@ -125,83 +139,107 @@ export function GeneratedSkills({ files }: GeneratedSkillsProps) {
                   </div>
 
                   {/* Markdown Content */}
-                  <div className="prose prose-invert prose-sm max-w-none">
-                <ReactMarkdown
-                  components={{
-                    // Customize heading styles
-                    h1: ({ children }) => (
-                      <h1 className="text-2xl font-bold text-white mb-4 mt-6 first:mt-0">
-                        {children}
-                      </h1>
-                    ),
-                    h2: ({ children }) => (
-                      <h2 className="text-xl font-semibold text-white mb-3 mt-5 first:mt-0">
-                        {children}
-                      </h2>
-                    ),
-                    h3: ({ children }) => (
-                      <h3 className="text-lg font-semibold text-zinc-200 mb-2 mt-4 first:mt-0">
-                        {children}
-                      </h3>
-                    ),
-                    // Customize paragraph styles
-                    p: ({ children }) => (
-                      <p className="text-sm text-zinc-300 mb-3 leading-relaxed">
-                        {children}
-                      </p>
-                    ),
-                    // Customize code blocks
-                    code: ({ className, children }) => {
-                      const isInline = !className;
-                      return isInline ? (
-                        <code className="px-1.5 py-0.5 bg-zinc-800 text-brand rounded text-xs font-mono">
-                          {children}
-                        </code>
-                      ) : (
-                        <code className="block p-3 bg-zinc-900 border border-zinc-800 rounded text-xs font-mono text-zinc-300 overflow-x-auto">
-                          {children}
-                        </code>
-                      );
-                    },
-                    // Customize lists
-                    ul: ({ children }) => (
-                      <ul className="list-disc list-inside text-sm text-zinc-300 mb-3 space-y-1">
-                        {children}
-                      </ul>
-                    ),
-                    ol: ({ children }) => (
-                      <ol className="list-decimal list-inside text-sm text-zinc-300 mb-3 space-y-1">
-                        {children}
-                      </ol>
-                    ),
-                    li: ({ children }) => (
-                      <li className="text-zinc-300">{children}</li>
-                    ),
-                    // Customize links
-                    a: ({ href, children }) => (
-                      <a
-                        href={href}
-                        className="text-brand hover:text-brand/80 underline transition-colors"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {children}
-                      </a>
-                    ),
-                    // Customize blockquotes
-                    blockquote: ({ children }) => (
-                      <blockquote className="border-l-4 border-brand/30 pl-4 py-2 my-3 bg-brand/5 text-zinc-400 italic">
-                        {children}
-                      </blockquote>
-                    ),
-                    // Customize horizontal rules
-                    hr: () => (
-                      <hr className="my-6 border-zinc-800" />
-                    ),
-                  }}
-                >
-                  {selectedFile.content}
-                </ReactMarkdown>
+                  <div className="prose prose-invert prose-sm max-w-none break-words overflow-hidden w-full min-w-0">
+                    <ReactMarkdown
+                      components={{
+                        // Customize heading styles
+                        h1: ({ children }) => (
+                          <h1 className="text-2xl font-bold text-white mb-4 mt-6 first:mt-0 break-words">
+                            {children}
+                          </h1>
+                        ),
+                        h2: ({ children }) => (
+                          <h2 className="text-xl font-semibold text-white mb-3 mt-5 first:mt-0 break-words">
+                            {children}
+                          </h2>
+                        ),
+                        h3: ({ children }) => (
+                          <h3 className="text-lg font-semibold text-zinc-200 mb-2 mt-4 first:mt-0 break-words">
+                            {children}
+                          </h3>
+                        ),
+                        // Customize paragraph styles
+                        p: ({ children }) => (
+                          <p className="text-sm text-zinc-300 mb-3 leading-relaxed break-words overflow-wrap-anywhere">
+                            {children}
+                          </p>
+                        ),
+                        // Customize code blocks
+                        code: ({ className, children }) => {
+                          const isInline = !className;
+                          return isInline ? (
+                            <code className="px-1.5 py-0.5 bg-zinc-800 text-brand rounded text-xs font-mono break-all">
+                              {children}
+                            </code>
+                          ) : (
+                            <code className="block p-3 bg-zinc-900 border border-zinc-800 rounded text-xs font-mono text-zinc-300 overflow-x-auto whitespace-pre-wrap break-words max-w-full">
+                              {children}
+                            </code>
+                          );
+                        },
+                        // Customize pre blocks (code block wrapper)
+                        pre: ({ children }) => (
+                          <pre className="overflow-x-auto max-w-full mb-3">
+                            {children}
+                          </pre>
+                        ),
+                        // Customize lists
+                        ul: ({ children }) => (
+                          <ul className="list-disc list-inside text-sm text-zinc-300 mb-3 space-y-1 break-words">
+                            {children}
+                          </ul>
+                        ),
+                        ol: ({ children }) => (
+                          <ol className="list-decimal list-inside text-sm text-zinc-300 mb-3 space-y-1 break-words">
+                            {children}
+                          </ol>
+                        ),
+                        li: ({ children }) => (
+                          <li className="text-zinc-300 break-words">
+                            {children}
+                          </li>
+                        ),
+                        // Customize links
+                        a: ({ href, children }) => (
+                          <a
+                            href={href}
+                            className="text-brand hover:text-brand/80 underline transition-colors break-all"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {children}
+                          </a>
+                        ),
+                        // Customize blockquotes
+                        blockquote: ({ children }) => (
+                          <blockquote className="border-l-4 border-brand/30 pl-4 py-2 my-3 bg-brand/5 text-zinc-400 italic break-words">
+                            {children}
+                          </blockquote>
+                        ),
+                        // Customize horizontal rules
+                        hr: () => <hr className="my-6 border-zinc-800" />,
+                        // Customize tables
+                        table: ({ children }) => (
+                          <div className="overflow-x-auto mb-3">
+                            <table className="min-w-full text-xs border border-zinc-800">
+                              {children}
+                            </table>
+                          </div>
+                        ),
+                        th: ({ children }) => (
+                          <th className="border border-zinc-800 px-2 py-1 bg-zinc-900 text-zinc-300 font-medium">
+                            {children}
+                          </th>
+                        ),
+                        td: ({ children }) => (
+                          <td className="border border-zinc-800 px-2 py-1 text-zinc-400">
+                            {children}
+                          </td>
+                        ),
+                      }}
+                    >
+                      {truncateContent(selectedFile.content)}
+                    </ReactMarkdown>
                   </div>
                 </div>
               ) : (

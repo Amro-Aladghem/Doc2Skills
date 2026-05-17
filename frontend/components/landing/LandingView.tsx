@@ -48,7 +48,6 @@ export function LandingView({ url, onUrlChange, onGenerate, error, isLoading }: 
         url={url}
         onUrlChange={onUrlChange}
         onGenerate={onGenerate}
-        isLoading={isLoading}
       />
       <FeatureList />
     </PageTransition>
