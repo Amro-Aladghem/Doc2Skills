@@ -35,8 +35,9 @@ export async function POST(req: NextRequest) {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
+      // console.error(errorData)
       return NextResponse.json(
-        { error: errorData.message || "Failed to analyze documentation" },
+        { error: errorData.detail[0].msg || "Failed to analyze documentation" },
         { status: response.status }
       );
     }
